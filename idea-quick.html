@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="세컨브레인">
+<title>💡 세컨브레인</title>
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#1a1a1a;--paper:#faf9f7;--paper2:#f2f0ec;--line:#e0ddd8;
+  --muted:#9a9690;--accent:#f59e0b;--green:#059669;--red:#e8294a;
+}
+html,body{height:100%;-webkit-tap-highlight-color:transparent;}
+body{
+  font-family:'Noto Sans KR',sans-serif;
+  background:var(--paper);color:var(--ink);
+  display:flex;flex-direction:column;
+  min-height:100vh;min-height:100dvh;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── HEADER ── */
+.header{
+  padding:20px 20px 16px;
+  border-bottom:1.5px solid var(--line);
+  display:flex;align-items:center;gap:12px;
+  flex-shrink:0;
+}
+.header-icon{font-size:28px;line-height:1;}
+.header-title{
+  font-weight:900;font-size:20px;
+  color:var(--ink);
+}
+.header-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* ── INPUT AREA ── */
+.input-area{
+  padding:20px;flex-shrink:0;
+  border-bottom:1.5px solid var(--line);
+  background:#fff;
+}
+.idea-textarea{
+  width:100%;
+  min-height:120px;
+  background:var(--paper2);
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:16px;line-height:1.6;
+  color:var(--ink);
+  outline:none;resize:none;
+  transition:border-color .15s;
+  -webkit-appearance:none;
+}
+.idea-textarea:focus{border-color:var(--ink);}
+.idea-textarea::placeholder{color:var(--muted);}
+
+/* Color picker */
+.color-row{display:flex;gap:8px;margin:12px 0;}
+.cchip{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid transparent;cursor:pointer;
+  transition:transform .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cchip.sel{border-color:var(--ink);transform:scale(1.15);}
+
+/* Save btn */
+.save-btn{
+  width:100%;
+  padding:16px;
+  background:var(--ink);color:#fff;
+  border:none;border-radius:14px;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:16px;font-weight:700;
+  cursor:pointer;
+  transition:opacity .15s, transform .1s;
+  -webkit-tap-highlight-color:transparent;
+  margin-top:12px;
+}
+.save-btn:active{opacity:.8;transform:scale(.98);}
+.save-btn:disabled{opacity:.4;}
+
+/* Status */
+.status{
+  text-align:center;
+  font-size:13px;font-weight:600;
+  padding:10px;border-radius:10px;
+  margin-top:10px;
+  display:none;
+}
+.status.ok{background:rgba(5,150,105,.1);color:var(--green);display:block;}
+.status.err{background:rgba(232,41,74,.08);color:var(--red);display:block;}
+.status.loading{background:rgba(26,26,26,.05);color:var(--muted);display:block;}
+
+/* ── IDEA LIST ── */
+.list-header{
+  padding:16px 20px 10px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-weight:600;letter-spacing:2px;
+  color:var(--muted);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.list-header button{
+  font-size:11px;color:var(--muted);
+  background:none;border:1px solid var(--line);
+  border-radius:6px;padding:3px 8px;cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif;transition:all .15s;
+}
+.list-header button:hover{border-color:var(--ink);color:var(--ink);}
+
+.idea-list{
+  flex:1;overflow-y:auto;
+  padding:0 16px 40px;
+  -webkit-overflow-scrolling:touch;
+}
+.idea-item{
+  display:flex;gap:10px;
+  padding:14px 14px;
+  background:#fff;border:1.5px solid var(--line);
+  border-radius:12px;margin-bottom:8px;
+  border-left:4px solid var(--accent);
+  animation:slideIn .18s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.idea-item-body{flex:1;min-width:0;}
+.idea-item-text{font-size:14px;line-height:1.5;word-break:break-word;}
+.idea-item-meta{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--muted);margin-top:6px;
+  display:flex;align-items:center;gap:6px;
+}
+.notion-badge{
+  font-size:9px;font-weight:700;padding:1px 5px;
+  border-radius:3px;background:rgba(5,150,105,.1);color:var(--green);
+}
+.idea-item-del{
+  color:var(--muted);font-size:16px;cursor:pointer;
+  padding:2px 4px;flex-shrink:0;transition:color .15s;
+}
+.idea-item-del:active{color:var(--red);}
+.idea-empty{
+  text-align:center;padding:48px 0;
+  color:var(--muted);font-size:14px;line-height:2;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">💡</div>
+  <div>
+    <div class="header-title">아이디어 메모</div>
+    <div class="header-sub">입력하면 노션에 자동 저장돼요</div>
+  </div>
+</div>
+
+<div class="input-area">
+  <textarea class="idea-textarea" id="ideaText"
+    placeholder="지금 떠오르는 생각을 적어보세요…" autofocus></textarea>
+  <div class="color-row" id="colorRow"></div>
+  <button class="save-btn" id="saveBtn" onclick="saveIdea()">저장하기</button>
+  <div class="status" id="status"></div>
+</div>
+
+<div class="list-header">
+  <span>최근 메모 <span id="countBadge"></span></span>
+  <button onclick="syncFromNotion()">↓ 노션 동기화</button>
+</div>
+
+<div class="idea-list" id="ideaList"></div>
+
+<script>
+const COLORS = ['#fef3c7','#dbeafe','#d1fae5','#fce7f3','#ede9fe','#f5f5f5'];
+const DS_ID  = '39a159cd-e568-4ddd-af71-3188061d4a31';
+let ideas = [];
+let selColor = COLORS[0];
+
+// ── persist ──
+function save(){ try{ localStorage.setItem('qa_ideas', JSON.stringify(ideas)); }catch(e){} }
+function load(){ try{ const r=localStorage.getItem('qa_ideas'); if(r) ideas=JSON.parse(r); }catch(e){} }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Color row ──
+function renderColors(){
+  document.getElementById('colorRow').innerHTML = COLORS.map(col=>`
+    <div class="cchip${selColor===col?' sel':''}"
+      style="background:${col};border-color:${selColor===col?'#1a1a1a':'transparent'}"
+      onclick="selColor='${col}';renderColors()"></div>`).join('');
+}
+
+// ── List ──
+function renderList(){
+  const el = document.getElementById('ideaList');
+  document.getElementById('countBadge').textContent = ideas.length ? `(${ideas.length})` : '';
+  if(!ideas.length){
+    el.innerHTML='<div class="idea-empty">아직 메모가 없어요 ✍️</div>'; return;
+  }
+  el.innerHTML = [...ideas].reverse().map(idea=>`
+    <div class="idea-item" style="border-left-color:${idea.color==='#f5f5f5'?'#e0ddd8':idea.color}">
+      <div class="idea-item-body">
+        <div class="idea-item-text">${esc(idea.text)}</div>
+        <div class="idea-item-meta">
+          ${idea.createdAt||''}
+          ${idea.notionUrl?'<span class="notion-badge">노션 ✓</span>':''}
+        </div>
+      </div>
+      <div class="idea-item-del" onclick="deleteIdea('${idea.id}')">×</div>
+    </div>`).join('');
+}
+
+function deleteIdea(id){
+  ideas = ideas.filter(i=>i.id!==id);
+  save(); renderList();
+}
+
+// ── Save ──
+async function saveIdea(){
+  const ta = document.getElementById('ideaText');
+  const text = ta.value.trim(); if(!text) return;
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  setStatus('저장 중…','loading');
+
+  const now = new Date();
+  const dateStr = `${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const idea = { id:uid(), text, color:selColor, createdAt:dateStr, notionUrl:null };
+
+  // 로컬 저장 먼저
+  ideas.push(idea); save(); renderList();
+  ta.value = '';
+
+  // 노션 저장
+  try{
+    const notionUrl = await pushToNotion(idea);
+    if(notionUrl){ idea.notionUrl=notionUrl; save(); renderList(); }
+    setStatus('✓ 노션에 저장됐어요!','ok');
+  }catch(e){
+    setStatus('로컬에 저장됨 (노션 연결 확인 필요)','err');
+  }
+  btn.disabled = false;
+  setTimeout(()=>setStatus('',''), 2500);
+}
+
+async function pushToNotion(idea){
+  const r = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:500,
+      mcp_servers:[{type:'url',url:'https://mcp.notion.com/mcp',name:'notion'}],
+      system:`Create one page in Notion DB data_source_id="${DS_ID}" with: 할 일="${idea.text}", 타입="💡 아이디어", 메모="${idea.createdAt}". Reply ONLY JSON: {"url":"notion page url"}`,
+      messages:[{role:'user',content:`Add idea: ${idea.text}`}]
+    })
+  });
+  const data = await r.json();
+  const txt = data.content?.find(b=>b.type==='text')?.text||'';
+  const parsed = JSON.parse(txt.replace(/```json|```/g,'').trim());
+  return parsed.url||null;
+}
+
+// ── Sync from Notion ──
+async function syncFromNotion(){
+  setStatus('노션에서 가져오는 중…','loading');
+  try{
+    const r = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:2000,
+        mcp_servers:[{type:'url',url:'https://mcp.notion.com/mcp',name:'notion'}],
+        system:`Query Notion DB data_source_id="${DS_ID}" for pages where 타입="💡 아이디어". Reply ONLY JSON: {"items":[{"url":"...","text":"할 일 value","createdAt":"메모 value"}]}`,
+        messages:[{role:'user',content:'Fetch all idea pages'}]
+      })
+    });
+    const data = await r.json();
+    const txt = data.content?.find(b=>b.type==='text')?.text||'';
+    const parsed = JSON.parse(txt.replace(/```json|```/g,'').trim());
+    let added = 0;
+    if(parsed.items){
+      parsed.items.forEach(item=>{
+        const exists = ideas.some(i=>i.notionUrl===item.url||i.text===item.text);
+        if(!exists&&item.text){
+          ideas.push({id:uid(),text:item.text,color:'#fef3c7',createdAt:item.createdAt||'노션',notionUrl:item.url});
+          added++;
+        }
+      });
+      if(added>0){ save(); renderList(); }
+    }
+    setStatus(added>0?`✓ ${added}개 가져왔어요`:'✓ 새 항목 없음','ok');
+  }catch(e){
+    setStatus('동기화 실패: '+e.message,'err');
+  }
+  setTimeout(()=>setStatus('',''), 3000);
+}
+
+function setStatus(msg, type){
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (type?' '+type:'');
+}
+
+// ── Keyboard ──
+document.getElementById('ideaText').addEventListener('keydown', e=>{
+  if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); saveIdea(); }
+});
+
+// ── Init ──
+load(); renderColors(); renderList();
+</script>
+</body>
+</html>
